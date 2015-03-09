@@ -11,6 +11,7 @@
 		<cm:default-properties>
 			<cm:property name="camel.poc.project.jms.endpoint.in" value="direct:JMS.ENDPOINT.IN" />
 			<cm:property name="camel.poc.project.jms.endpoint.out" value="mock:JMS.ENDPOINT.OUT" />
+			<cm:property name="camel.poc.project.jms.endpoint.dlq" value="mock:JMS.ENDPOINT.DLQ" />
 		</cm:default-properties>
 	</cm:property-placeholder>
 

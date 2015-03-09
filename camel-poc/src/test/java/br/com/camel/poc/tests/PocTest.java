@@ -1,7 +1,8 @@
 package br.com.camel.poc.tests;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
 import org.junit.Test;
@@ -19,40 +20,40 @@ public class PocTest extends CamelBlueprintTestSupport {
 	}
 
 	@Test
+	/**
+	 * Success test
+	 */
 	public void testCase_01() {
 
 		try {
-			getMockEndpoint("{{camel.poc.project.jms.endpoint.out}}")
-					.expectedMessageCount(1);
+			getMockEndpoint("{{camel.poc.project.jms.endpoint.out}}").expectedMessageCount(1);
+			String message = new String(Files.readAllBytes(Paths.get("target/test-classes/messages/input-message-01.xml")));
 
-			template.sendBody("{{camel.poc.project.jms.endpoint.in}}", getFileAsStream());
+			template.sendBody("{{camel.poc.project.jms.endpoint.in}}", message);
 			assertMockEndpointsSatisfied();
 		} catch (InterruptedException interruptedException) {
 			interruptedException.printStackTrace();
-		}
-	}
-
-	public String getFileAsStream() {
-
-		StringBuilder builder = new StringBuilder();
-		InputStream inputStream = null;
-		try {
-			inputStream = getClass().getClassLoader().getResourceAsStream("messages/input-message-01.xml");
-			int content;
-			while ((content = inputStream.read()) != -1) {
-				builder.append((char) content);
-			}
-
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null)
-					inputStream.close();
-			} catch (IOException exception) {
-				exception.printStackTrace();
-			}
 		}
-		return builder.toString();
+	}
+	
+	@Test
+	/**
+	 * Testing the default error handler
+	 */
+	public void testCase_02() {
+		
+		try {
+			getMockEndpoint("{{camel.poc.project.jms.endpoint.dlq}}").expectedMessageCount(1);
+			String message = new String(Files.readAllBytes(Paths.get("target/test-classes/messages/input-message-02.xml")));
+
+			template.sendBody("{{camel.poc.project.jms.endpoint.in}}", message);
+			assertMockEndpointsSatisfied();
+		} catch (InterruptedException interruptedException) {
+			interruptedException.printStackTrace();
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
 	}
 }
